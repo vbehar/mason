@@ -1,0 +1,57 @@
+commonSpec: &commonSpec
+  sources:
+    include:
+      - go.mod
+      - go.sum
+      - "**/*.go"
+    exclude:
+      - .history
+      - "**/_test.go"
+  buildArgs:
+    - -ldflags
+    - -X "main.version=0.0.1"
+---
+kind: GoBinary
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+metadata:
+  name: mason-linux-amd64
+  labels:
+    os: linux
+    arch: amd64
+spec:
+  <<: *commonSpec
+  os: linux
+  arch: amd64
+  output:
+    daggerFileName: mason_linux_amd64
+    hostFilePath: bin/mason-linux-amd64
+---
+kind: GoBinary
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+metadata:
+  name: mason-linux-arm64
+  labels:
+    os: linux
+    arch: arm64
+spec:
+  <<: *commonSpec
+  os: linux
+  arch: arm64
+  output:
+    daggerFileName: mason_linux_arm64
+    hostFilePath: bin/mason-linux-arm64
+---
+kind: GoBinary
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+metadata:
+  name: mason-darwin-arm64
+  labels:
+    os: darwin
+    arch: arm64
+spec:
+  <<: *commonSpec
+  os: darwin
+  arch: arm64
+  output:
+    daggerFileName: mason_darwin_arm64
+    hostFilePath: bin/mason-darwin-arm64

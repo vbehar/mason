@@ -1,0 +1,16 @@
+kind: GoTest
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+metadata:
+  name: unit-tests
+  labels:
+    kind: unit
+spec:
+  sources:
+    include:
+      - go.mod
+      - go.sum
+      - "**/*.go"
+    exclude:
+      - .history
+  output:
+    junitHostFilePath: tests-junit-report.xml

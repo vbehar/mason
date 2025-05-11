@@ -1,0 +1,12 @@
+kind: GoLint
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+metadata:
+  name: golangci-lint
+spec:
+  sources:
+    exclude:
+      - .history
+      - .mason
+      - bin
+  output:
+    codeClimateHostFilePath: code-climate.json
