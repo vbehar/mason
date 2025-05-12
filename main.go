@@ -5,6 +5,7 @@ import (
 
 	"github.com/anchore/clio"
 	"github.com/vbehar/mason/pkg/cli"
+	"golang.org/x/mod/module"
 )
 
 const applicationName = "mason"
@@ -25,6 +26,12 @@ func appID() clio.Identification {
 	if version == "" {
 		version = defaultVersion()
 	}
+	if buildDate == "" {
+		buildDate = defaultBuildDate()
+	}
+	if gitCommit == "" {
+		gitCommit = defaultGitCommit()
+	}
 	return clio.Identification{
 		Name:           applicationName,
 		Version:        version,
@@ -38,6 +45,30 @@ func defaultVersion() string {
 	if info, ok := debug.ReadBuildInfo(); ok {
 		if v := info.Main.Version; v != "" {
 			return v
+		}
+	}
+	return ""
+}
+
+func defaultBuildDate() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		if v := info.Main.Version; v != "" && module.IsPseudoVersion(v) {
+			t, err := module.PseudoVersionTime(v)
+			if err == nil {
+				return t.Format("2006-01-02T15:04:05Z07:00")
+			}
+		}
+	}
+	return ""
+}
+
+func defaultGitCommit() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		if v := info.Main.Version; v != "" && module.IsPseudoVersion(v) {
+			rev, err := module.PseudoVersionRev(v)
+			if err == nil {
+				return rev
+			}
 		}
 	}
 	return ""

@@ -12,12 +12,14 @@ commonSpec: &commonSpec
     - -X "main.version=0.0.1"
 ---
 kind: GoBinary
-moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.2
 metadata:
   name: mason-linux-amd64
   labels:
     os: linux
     arch: amd64
+  extraPhases:
+    - run
 spec:
   <<: *commonSpec
   os: linux
@@ -27,12 +29,14 @@ spec:
     hostFilePath: bin/mason-linux-amd64
 ---
 kind: GoBinary
-moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.2
 metadata:
   name: mason-linux-arm64
   labels:
     os: linux
     arch: arm64
+  extraPhases:
+    - run
 spec:
   <<: *commonSpec
   os: linux
@@ -42,7 +46,7 @@ spec:
     hostFilePath: bin/mason-linux-arm64
 ---
 kind: GoBinary
-moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.2
 metadata:
   name: mason-darwin-arm64
   labels:

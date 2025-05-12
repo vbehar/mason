@@ -12,6 +12,7 @@ func (b Brick) IsValid() bool {
 }
 
 type BrickMetadata struct {
-	Name   string            `json:"name"`
-	Labels map[string]string `json:"labels"`
+	Name        string            `json:"name"`
+	Labels      map[string]string `json:"labels"`
+	ExtraPhases []string          `json:"extraPhases"`
 }

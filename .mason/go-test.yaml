@@ -1,9 +1,9 @@
 kind: GoTest
-moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.2
 metadata:
   name: unit-tests
   labels:
-    kind: unit
+    type: unit
 spec:
   sources:
     include:

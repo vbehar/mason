@@ -15,6 +15,7 @@ require (
 	github.com/rs/xid v1.6.0
 	github.com/spf13/cobra v1.9.1
 	github.com/wagoodman/go-partybus v0.0.0-20230516145632-8ccac152c651
+	golang.org/x/mod v0.24.0
 )
 
 require (

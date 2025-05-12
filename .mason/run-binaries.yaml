@@ -1,0 +1,33 @@
+kind: RunBinary
+moduleRef: github.com/vbehar/mason-modules/run@v0.0.2
+metadata:
+  name: mason-version-amd64
+  labels:
+    arch: amd64
+spec:
+  platform: linux/amd64
+  baseImage: cgr.dev/chainguard/wolfi-base
+  binaries:
+    - source:
+        daggerFileName: mason_linux_amd64
+      path: /usr/local/bin/mason
+  command:
+    - /usr/local/bin/mason
+    - version
+---
+kind: RunBinary
+moduleRef: github.com/vbehar/mason-modules/run@v0.0.2
+metadata:
+  name: mason-version-arm64
+  labels:
+    arch: arm64
+spec:
+  platform: linux/arm64
+  baseImage: cgr.dev/chainguard/wolfi-base
+  binaries:
+    - source:
+        daggerFileName: mason_linux_arm64
+      path: /usr/local/bin/mason
+  command:
+    - /usr/local/bin/mason
+    - version

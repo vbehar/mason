@@ -1,0 +1,7 @@
+aliases:
+  validate:
+    - phase: test
+      selector: type=unit
+    - phase: lint
+    - phase: package
+    - phase: run

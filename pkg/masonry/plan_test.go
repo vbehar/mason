@@ -35,7 +35,7 @@ $my_container | file "/etc/alpine-release" | contents
 # SingleSourceScript
 my_container=$(container | from alpine)
 $my_container | file "/etc/alpine-release" | contents
-_echo`,
+.echo`,
 		},
 		{
 			name: "multiple scripts without variables",
@@ -53,11 +53,11 @@ _echo`,
 
 # AlpineScript
 container | from alpine | file /etc/alpine-release | contents
-_echo
+.echo
 
 # DebianScript
 container | from debian | file /etc/debian_version | contents
-_echo`,
+.echo`,
 		},
 		{
 			name: "multiple scripts with variables",
@@ -82,12 +82,12 @@ $debian_ctr | file "/etc/debian_version" | contents
 # AlpineScript
 alpine_ctr=$(container | from alpine)
 $alpine_ctr | file "/etc/alpine-release" | contents
-_echo
+.echo
 
 # DebianScript
 debian_ctr=$(container | from debian)
 $debian_ctr | file "/etc/debian_version" | contents
-_echo`,
+.echo`,
 		},
 		{
 			name: "multiple scripts with re-used variables",
@@ -124,28 +124,28 @@ $alpine_os_release_file | export "/path/to/alpine_release"
 
 # Script4
 alpine_ctr=$(container | from alpine)
-_echo
+.echo
 
 # Script6
 $alpine_ctr | file "/etc/alpine-release" | export "/path/to/alpine_release"
-_echo
+.echo
 
 # Script2
 alpine_etc_dir=$($alpine_ctr | directory /etc)
-_echo
+.echo
 
 # Script3
 $alpine_etc_dir | file "alpine-release" | export "/path/to/alpine_release"
-_echo
+.echo
 
 # Script1
 debian_ctr=$(container | from debian); alpine_os_release_file=$($alpine_ctr | file "/etc/os-release")
-_echo
+.echo
 
 # Script5
 $debian_ctr | file "/etc/debian_version" | export "/path/to/debian_version"
 $alpine_os_release_file | export "/path/to/alpine_release"
-_echo`,
+.echo`,
 		},
 		{
 			name: "complex script",
@@ -166,12 +166,12 @@ $mason_darwin_arm64 | export bin/mason-darwin-arm64`,
 # darwin_arm64
 mason_darwin_arm64=$(https://github.com/vbehar/mason-modules/golang $(host | directory . --exclude ".history",".mason","bin") | build-binary --go-os darwin --go-arch arm64 --args "-ldflags","-X main.version=1.0.0" --output-file-name mason_darwin_arm64)
 $mason_darwin_arm64 | export bin/mason-darwin-arm64
-_echo
+.echo
 
 # linux_arm64
 mason_linux_arm64=$(https://github.com/vbehar/mason-modules/golang $(host | directory . --exclude ".history",".mason","bin") | build-binary --go-os linux --go-arch arm64 --args "-ldflags","-X main.version=1.0.0" --output-file-name mason_linux_arm64)
 $mason_linux_arm64 | export bin/mason-linux-arm64
-_echo`,
+.echo`,
 		},
 		{
 			name: "variable defined twice",

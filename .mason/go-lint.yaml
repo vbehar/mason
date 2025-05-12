@@ -1,5 +1,5 @@
 kind: GoLint
-moduleRef: github.com/vbehar/mason-modules/golang@v0.0.1
+moduleRef: github.com/vbehar/mason-modules/golang@v0.0.2
 metadata:
   name: golangci-lint
 spec:

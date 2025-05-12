@@ -1,2 +1,4 @@
 /.mason/.work
 /bin
+/code-climate.json
+/tests-junit-report.xml

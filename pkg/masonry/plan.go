@@ -147,6 +147,9 @@ func (p *Plan) computeMergedScript() error {
 	for _, script := range p.SourceScripts {
 		err := variablesDAG.AddVertexByID(string(script.Content), script)
 		if err != nil {
+			if errors.As(err, &dag.IDDuplicateError{}) {
+				continue // can happen if the same script is used in multiple phases...
+			}
 			return fmt.Errorf("failed to add script from %q to DAG: %w", script.Name, err)
 		}
 
@@ -200,7 +203,7 @@ func (p *Plan) computeMergedScript() error {
 		}
 		p.MergedScript += fmt.Sprintf("# %s\n", script.Name)
 		p.MergedScript += strings.TrimSpace(string(script.Content)) + "\n"
-		p.MergedScript += "_echo\n\n" // we echo an empty line to separate scripts output
+		p.MergedScript += ".echo\n\n" // we echo an empty line to separate scripts output
 	}))
 	p.MergedScript = strings.TrimSpace(p.MergedScript)
 
@@ -220,25 +223,27 @@ func (p Plan) Run() error {
 	}
 
 	p.logger().WithFields("script", planFilePath).Info("Applying plan with Dagger")
-	var output bytes.Buffer
+	var daggerOutWriter bytes.Buffer
 	err = dagger.ExecScript(dagger.ExecScriptOpts{
 		ScriptPath: planFilePath,
 		Env:        p.blueprint.workspace.mason.DaggerEnv,
 		Args:       p.blueprint.workspace.mason.DaggerArgs,
 		Stderr:     p.blueprint.workspace.mason.DaggerOut,
-		Stdout:     &output,
+		Stdout:     &daggerOutWriter,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to run plan: %w", err)
 	}
 
+	output := strings.TrimSpace(daggerOutWriter.String())
+
 	p.logger().Infof("Dagger output:\n%+v\n",
-		color.Success.Sprint(indent.String("  ", output.String())),
+		color.Success.Sprint(indent.String("  ", output)),
 	)
 	p.blueprint.workspace.mason.EventBus.Publish(partybus.Event{
 		Type:   EventTypeDaggerOutput,
 		Source: p,
-		Value:  output.String(),
+		Value:  output,
 	})
 
 	return nil

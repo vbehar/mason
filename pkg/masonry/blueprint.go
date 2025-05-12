@@ -98,25 +98,27 @@ func (b Blueprint) RenderPlan() (*Plan, error) {
 	}
 
 	b.logger().WithFields("script", daggerScriptFilePath).Info("Rendering plan with Dagger")
-	var output bytes.Buffer
+	var daggerOutWriter bytes.Buffer
 	err = dagger.ExecScript(dagger.ExecScriptOpts{
 		ScriptPath: daggerScriptFilePath,
 		Env:        b.workspace.mason.DaggerEnv,
 		Args:       b.workspace.mason.DaggerArgs,
 		Stderr:     b.workspace.mason.DaggerOut,
-		Stdout:     &output,
+		Stdout:     &daggerOutWriter,
 	})
 	if err != nil {
 		return nil, err
 	}
 
+	output := strings.TrimSpace(daggerOutWriter.String())
+
 	b.logger().Infof("Dagger output:\n%+v\n",
-		color.Success.Sprint(indent.String("  ", output.String())),
+		color.Success.Sprint(indent.String("  ", output)),
 	)
 	b.workspace.mason.EventBus.Publish(partybus.Event{
 		Type:   EventTypeDaggerOutput,
 		Source: b,
-		Value:  output.String(),
+		Value:  output,
 	})
 
 	b.logger().WithFields("path", planDir).Debug("Parsing generated plan")
