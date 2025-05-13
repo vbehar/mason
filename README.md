@@ -2,6 +2,8 @@
 
 **Declarative build tool based on [Dagger](https://dagger.io/).**
 
+[![demo](https://asciinema.org/a/719109.svg)](https://asciinema.org/a/719109)
+
 ## Overview
 
 **Mason** aims to provide:
@@ -113,7 +115,9 @@ A **plan** is a Dagger script that defines the operations to run. It is generate
 
 ### Why Mason?
 
-TODO
+I wrote a blog post on that topic: [Mason: a declarative build tool on top of Dagger](https://whtwnd.com/vbehar.dev/3lp2uqrwpbo2i).
+
+TL;DR as tried to spread the usage of Dagger at work, I found some limitations in its current form. Mainly the lack declarative configuration and the complexity of running "tasks". Mason is my attempt to solve these issues...
 
 ## Getting Started
 
@@ -154,6 +158,49 @@ To get started with Mason, the easiest way is to use `mason` to build itself:
 
 Mason is a wrapper around Dagger, and it relies heavily on the Dagger Shell feature, to run Dagger scripts.
 
+A simplified sequence diagram to package 2 different artifacts (a Go binary and a container image) is shown below:
+
+```mermaid
+sequenceDiagram
+    actor user as User
+    participant mason as Mason
+    participant dagger as Dagger
+    participant module-go as Dagger Module: Golang
+    participant module-oci as Dagger Module: OCI
+    user->>mason: package
+    activate mason
+    mason->>mason: Load blueprint
+    mason->>dagger: Exec script
+    activate dagger
+    dagger->>module-go: Render plan
+    activate module-go
+    dagger->>module-oci: Render plan
+    activate module-oci
+    module-go->>dagger: plan (directory)
+    deactivate module-go
+    module-oci->>dagger: plan (directory)
+    deactivate module-oci
+    dagger->>mason: plans (directories)
+    deactivate dagger
+    mason->>mason: Merge plans
+    mason->>dagger: Exec script
+    activate dagger
+    dagger->>module-go: cmds...
+    activate module-go
+    module-go->>module-go: cmds..
+    module-go->>dagger: output
+    deactivate module-go
+    dagger->>module-oci: cmds...
+    activate module-oci
+    module-oci->>module-oci: cmds..
+    module-oci->>dagger: output
+    deactivate module-oci
+    dagger->>mason: output
+    deactivate dagger
+    mason->>user: output
+    deactivate mason
+```
+
 For each phase, Mason will call Dagger twice:
 1. with a script to generate the **plan**, similar to:
 ```shell
@@ -193,4 +240,4 @@ See [github.com/vbehar/mason-modules](https://github.com/vbehar/mason-modules) f
 
 ## Contributing
 
-TODO
+Feel free to open issues or PRs. We are happy to accept contributions, and we will try to review them as soon as possible.
