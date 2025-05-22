@@ -13,7 +13,9 @@ var masonConfig = &MasonConfig{
 	RootPath:    ".",
 	IgnoredDirs: []string{".git"},
 	KeepWorkDir: false,
-	Dagger:      DaggerConfig{},
+	Dagger: DaggerConfig{
+		Binary: "dagger",
+	},
 }
 
 var _ interface {
@@ -82,6 +84,7 @@ func (c *MasonConfig) PostLoad() error {
 	mason.IgnoredDirs = c.IgnoredDirs
 	mason.DaggerArgs = c.Dagger.Args
 	mason.DaggerEnv = c.Dagger.Env
+	mason.DaggerBinary = c.Dagger.Binary
 	return nil
 }
 
@@ -90,11 +93,13 @@ var _ interface {
 } = (*DaggerConfig)(nil)
 
 type DaggerConfig struct {
-	Env  []string `mapstructure:"env"`
-	Args []string `mapstructure:"args"`
+	Binary string   `mapstructure:"binary"`
+	Env    []string `mapstructure:"env"`
+	Args   []string `mapstructure:"args"`
 }
 
 func (c *DaggerConfig) AddFlags(flags clio.FlagSet) {
+	flags.StringVarP(&c.Binary, "dagger-binary", "", "Path to the dagger binary")
 	flags.StringArrayVarP(&c.Env, "dagger-env", "", "Environment variables to pass to the dagger command")
 	flags.StringArrayVarP(&c.Args, "dagger-args", "", "Arguments (flags) to pass to the dagger command")
 }

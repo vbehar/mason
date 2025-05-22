@@ -5,19 +5,21 @@ import (
 	"testing"
 )
 
-func TestPlanComputeMergedScript(t *testing.T) {
+func TestPlanComputeFinalScripts(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name          string
-		sourceScripts []Script
-		expected      string
-		expectedError string
+		name                           string
+		sourceScripts                  []Script
+		expectedScript                 string
+		expectedPostRunOnSuccessScript string
+		expectedPostRunOnFailureScript string
+		expectedError                  string
 	}{
 		{
-			name:          "empty source scripts",
-			sourceScripts: []Script{},
-			expected:      "",
+			name:           "empty source scripts",
+			sourceScripts:  []Script{},
+			expectedScript: "",
 		},
 		{
 			name: "single source script",
@@ -30,7 +32,7 @@ $my_container | file "/etc/alpine-release" | contents
 `,
 				},
 			},
-			expected: `#!/usr/bin/env dagger
+			expectedScript: `#!/usr/bin/env dagger
 
 # SingleSourceScript
 my_container=$(container | from alpine)
@@ -49,7 +51,7 @@ $my_container | file "/etc/alpine-release" | contents
 					Content: "container | from debian | file /etc/debian_version | contents",
 				},
 			},
-			expected: `#!/usr/bin/env dagger
+			expectedScript: `#!/usr/bin/env dagger
 
 # AlpineScript
 container | from alpine | file /etc/alpine-release | contents
@@ -77,7 +79,7 @@ $debian_ctr | file "/etc/debian_version" | contents
 `,
 				},
 			},
-			expected: `#!/usr/bin/env dagger
+			expectedScript: `#!/usr/bin/env dagger
 
 # AlpineScript
 alpine_ctr=$(container | from alpine)
@@ -120,7 +122,7 @@ $alpine_os_release_file | export "/path/to/alpine_release"
 					Content: `$alpine_ctr | file "/etc/alpine-release" | export "/path/to/alpine_release"`,
 				},
 			},
-			expected: `#!/usr/bin/env dagger
+			expectedScript: `#!/usr/bin/env dagger
 
 # Script4
 alpine_ctr=$(container | from alpine)
@@ -161,7 +163,7 @@ $mason_linux_arm64 | export bin/mason-linux-arm64`,
 $mason_darwin_arm64 | export bin/mason-darwin-arm64`,
 				},
 			},
-			expected: `#!/usr/bin/env dagger
+			expectedScript: `#!/usr/bin/env dagger
 
 # darwin_arm64
 mason_darwin_arm64=$(https://github.com/vbehar/mason-modules/golang $(host | directory . --exclude ".history",".mason","bin") | build-binary --go-os darwin --go-arch arm64 --args "-ldflags","-X main.version=1.0.0" --output-file-name mason_darwin_arm64)
@@ -171,6 +173,74 @@ $mason_darwin_arm64 | export bin/mason-darwin-arm64
 # linux_arm64
 mason_linux_arm64=$(https://github.com/vbehar/mason-modules/golang $(host | directory . --exclude ".history",".mason","bin") | build-binary --go-os linux --go-arch arm64 --args "-ldflags","-X main.version=1.0.0" --output-file-name mason_linux_arm64)
 $mason_linux_arm64 | export bin/mason-linux-arm64
+.echo`,
+		},
+		{
+			name: "single script with post-run on success",
+			sourceScripts: []Script{
+				{
+					Name: "SingleSourceScript",
+					Content: `
+my_container=$(container | from alpine)
+$my_container | file "/etc/alpine-release" | contents
+`,
+				},
+				{
+					Name:    "PostRunOnSuccess",
+					PostRun: PostRunOnSuccess,
+					Content: ".echo 'Post run on success'",
+				},
+			},
+			expectedScript: `#!/usr/bin/env dagger
+
+# SingleSourceScript
+my_container=$(container | from alpine)
+$my_container | file "/etc/alpine-release" | contents
+.echo`,
+			expectedPostRunOnSuccessScript: `#!/usr/bin/env dagger
+
+# Post run on-success script
+
+# post-run-init
+log_file_path=$(.echo -n "dagger_.log")
+.echo
+
+# PostRunOnSuccess
+.echo 'Post run on success'
+.echo`,
+		},
+		{
+			name: "single script with post-run on failure",
+			sourceScripts: []Script{
+				{
+					Name: "SingleSourceScript",
+					Content: `
+my_container=$(container | from alpine)
+$my_container | file "/etc/alpine-release" | contents
+`,
+				},
+				{
+					Name:    "PostRunOnFailure",
+					PostRun: PostRunOnFailure,
+					Content: "host | directory . | file $log_file_path | contents",
+				},
+			},
+			expectedScript: `#!/usr/bin/env dagger
+
+# SingleSourceScript
+my_container=$(container | from alpine)
+$my_container | file "/etc/alpine-release" | contents
+.echo`,
+			expectedPostRunOnFailureScript: `#!/usr/bin/env dagger
+
+# Post run on-failure script
+
+# post-run-init
+log_file_path=$(.echo -n "dagger_.log")
+.echo
+
+# PostRunOnFailure
+host | directory . | file $log_file_path | contents
 .echo`,
 		},
 		{
@@ -216,22 +286,32 @@ $mason_linux_arm64 | export bin/mason-linux-arm64
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			plan := &Plan{
 				SourceScripts: tt.sourceScripts,
 			}
-			err := plan.computeMergedScript()
+			err := plan.computeFinalScripts()
 			if err != nil {
 				if tt.expectedError == "" {
 					t.Fatalf("unexpected error: %v", err)
 				} else if !strings.Contains(err.Error(), tt.expectedError) {
 					t.Fatalf("expected error: %v, got: %v", tt.expectedError, err)
 				}
-			} else {
-				if tt.expectedError != "" {
-					t.Fatalf("expected error: %v, got a merged script:\n%s", tt.expectedError, plan.MergedScript)
-				} else if plan.MergedScript != tt.expected {
-					t.Errorf("expected merged script:\n%s\n\ngot:\n%s", tt.expected, plan.MergedScript)
-				}
+				return
+			}
+
+			if tt.expectedError != "" {
+				t.Fatalf("expected error: %v, got a merged script:\n%s", tt.expectedError, plan.MergedScript)
+			}
+
+			if plan.MergedScript != tt.expectedScript {
+				t.Errorf("expected merged script:\n%s\n\ngot:\n%s", tt.expectedScript, plan.MergedScript)
+			}
+			if plan.PostRunOnSuccessScript != tt.expectedPostRunOnSuccessScript {
+				t.Errorf("expected post-run on success script:\n%s\n\ngot:\n%s", tt.expectedPostRunOnSuccessScript, plan.PostRunOnSuccessScript)
+			}
+			if plan.PostRunOnFailureScript != tt.expectedPostRunOnFailureScript {
+				t.Errorf("expected post-run on failure script:\n%s\n\ngot:\n%s", tt.expectedPostRunOnFailureScript, plan.PostRunOnFailureScript)
 			}
 		})
 	}

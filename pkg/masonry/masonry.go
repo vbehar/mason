@@ -13,4 +13,5 @@ var Phases = map[string]string{
 	"package": "Package artifacts",
 	"publish": "Publish artifacts",
 	"run":     "Run the application",
+	"review":  "Review the source code",
 }

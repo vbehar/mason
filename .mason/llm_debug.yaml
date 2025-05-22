@@ -1,0 +1,12 @@
+kind: PipelineDebug
+moduleRef: github.com/vbehar/mason-modules/mason-llm@v0.0.3
+metadata:
+  name: pipeline-debug
+  postRun: on_failure
+spec:
+  workspace:
+    path: .
+    exclude: [.history, bin]
+  output:
+    daggerFileName: pipeline_debug
+    hostFilePath: pipeline-debug.md

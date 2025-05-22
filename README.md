@@ -136,7 +136,7 @@ This will install the latest version of Mason in your `$GOPATH/bin` directory. M
 * [Dagger](https://dagger.io/)
 * Access to a [Docker](https://docker.com/) daemon
 
-Mason requires the Dagger CLI to be installed and available in your `PATH`.
+Mason requires the Dagger CLI to be installed.
 
 ### Configuration
 

@@ -1,0 +1,11 @@
+kind: CodeReview
+moduleRef: github.com/vbehar/mason-modules/mason-llm@v0.0.3
+metadata:
+  name: code-review
+spec:
+  workspace:
+    path: .
+    exclude: [.mason/.work, .history, bin]
+  output:
+    daggerFileName: code_review
+    hostFilePath: code-review.md

@@ -9,11 +9,6 @@ import (
 	"github.com/wagoodman/go-partybus"
 )
 
-const (
-	EventTypeRenderPlan = partybus.EventType("plan.render")
-	EventTypeApplyPlan  = partybus.EventType("plan.apply")
-)
-
 type UI struct {
 	Output io.Writer
 }
@@ -24,24 +19,35 @@ func (ui *UI) Setup(subscription partybus.Unsubscribable) error {
 
 func (ui *UI) Handle(event partybus.Event) error {
 	switch event.Type {
-	case EventTypeRenderPlan:
+	case masonry.EventTypeRenderPlan:
 		phase := event.Source.(map[string]string)["phase"]
 		ui.print(phaseStyle.Render(phase))
 		ui.println(descriptionStyle.Render("Rendering plan..."))
-	case EventTypeApplyPlan:
+	case masonry.EventTypeApplyPlan:
 		phase := event.Source.(map[string]string)["phase"]
+		postRun := event.Source.(map[string]string)["postRun"]
 		ui.print(phaseStyle.Render(phase))
-		ui.println(descriptionStyle.Render("Applying plan..."))
-	case masonry.EventTypeDaggerOutput:
-		switch src := event.Source.(type) {
-		case masonry.Blueprint:
-			// "render plan" output
-		case masonry.Plan:
-			// "apply plan" output
-			ui.print(phaseStyle.Render(src.Phase))
-			ui.println(descriptionStyle.Render("Dagger output:"))
-			ui.println(event.Value.(string))
+		switch masonry.PostRun(postRun) {
+		case masonry.PostRunOnSuccess:
+			ui.println(postRunOnSuccessStyle.Render("Post run on success..."))
+		case masonry.PostRunOnFailure:
+			ui.println(postRunOnFailureStyle.Render("Post run on error..."))
+		default:
+			ui.println(descriptionStyle.Render("Applying plan..."))
 		}
+	case masonry.EventTypeDaggerOutput:
+		phase := event.Source.(map[string]string)["phase"]
+		postRun := event.Source.(map[string]string)["postRun"]
+		ui.print(phaseStyle.Render(phase))
+		switch masonry.PostRun(postRun) {
+		case masonry.PostRunOnSuccess:
+			ui.println(postRunOnSuccessStyle.Render("Post run on success Dagger output:"))
+		case masonry.PostRunOnFailure:
+			ui.println(postRunOnFailureStyle.Render("Post run on error Dagger output:"))
+		default:
+			ui.println(descriptionStyle.Render("Dagger output:"))
+		}
+		ui.println(event.Value.(string))
 	}
 	return nil
 }
@@ -64,5 +70,17 @@ var (
 			BorderForeground(lipgloss.Color("#874BFD")).
 			Foreground(lipgloss.AdaptiveColor{Light: "#43BF6D", Dark: "#73F59F"}).
 			Margin(0, 1, 0, 0)
+	postRunOnSuccessStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#43BF6D")).
+				Background(lipgloss.Color("#1E1E2D")).
+				Border(lipgloss.RoundedBorder(), false, true).
+				BorderForeground(lipgloss.Color("#874BFD")).
+				Margin(0, 1, 0, 0)
+	postRunOnFailureStyle = lipgloss.NewStyle().
+				Foreground(lipgloss.Color("#F00")).
+				Background(lipgloss.Color("#1E1E2D")).
+				Border(lipgloss.RoundedBorder(), false, true).
+				BorderForeground(lipgloss.Color("#874BFD")).
+				Margin(0, 1, 0, 0)
 	descriptionStyle = lipgloss.NewStyle()
 )

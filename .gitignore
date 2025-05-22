@@ -1,4 +1,7 @@
+/.history
 /.mason/.work
 /bin
 /code-climate.json
 /tests-junit-report.xml
+/code-review.md
+/pipeline-debug.md

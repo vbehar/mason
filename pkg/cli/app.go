@@ -53,7 +53,7 @@ func clioSetupConfig(id clio.Identification) *clio.SetupConfig {
 			mason.EventBus = state.Bus
 			mason.Logger = state.Logger
 			if state.Config.Log.Quiet {
-				mason.DaggerOut = io.Discard
+				mason.DaggerOutputDisabled = true
 			}
 			return nil
 		}).
@@ -63,6 +63,11 @@ func clioSetupConfig(id clio.Identification) *clio.SetupConfig {
 				if cleanErr != nil {
 					state.Logger.Warn(cleanErr)
 				}
+			}
+			if err != nil {
+				state.Logger.
+					WithFields("workdirs", mason.WorkDirs()).
+					Infof("Keeping workdirs")
 			}
 		})
 }

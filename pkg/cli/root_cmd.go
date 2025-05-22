@@ -81,7 +81,7 @@ func run(cmd *cobra.Command, args []string) error {
 		filteredBlueprint := blueprint.Filter(phaseCfg.labelSelector)
 
 		mason.EventBus.Publish(partybus.Event{
-			Type:   EventTypeRenderPlan,
+			Type:   masonry.EventTypeRenderPlan,
 			Source: map[string]string{"phase": phaseCfg.Phase},
 		})
 		plan, err := filteredBlueprint.RenderPlan()
@@ -99,10 +99,6 @@ func run(cmd *cobra.Command, args []string) error {
 			continue
 		}
 
-		mason.EventBus.Publish(partybus.Event{
-			Type:   EventTypeApplyPlan,
-			Source: map[string]string{"phase": phaseCfg.Phase},
-		})
 		err = plan.Run()
 		if err != nil {
 			return err

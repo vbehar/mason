@@ -3,7 +3,6 @@ package masonry
 import (
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -15,11 +14,12 @@ import (
 )
 
 type Mason struct {
-	RootPath    string
-	IgnoredDirs []string
-	DaggerOut   io.Writer // this is the stderr of the dagger process
-	DaggerEnv   []string
-	DaggerArgs  []string
+	RootPath             string
+	IgnoredDirs          []string
+	DaggerEnv            []string
+	DaggerArgs           []string
+	DaggerBinary         string
+	DaggerOutputDisabled bool
 
 	EventBus *partybus.Bus
 	Logger   logger.Logger
@@ -33,7 +33,6 @@ func NewMason() *Mason {
 		EventBus:    partybus.NewBus(),
 		RootPath:    ".",
 		IgnoredDirs: []string{".git"},
-		DaggerOut:   os.Stderr, // dagger's default is stderr, let's keep it that way
 	}
 }
 
@@ -88,13 +87,21 @@ func (m *Mason) DetectWorkspaces() ([]Workspace, error) {
 	return workspaces, nil
 }
 
+func (m Mason) WorkDirs() []string {
+	workDirs := make([]string, 0, len(m.workspaces))
+	for _, workspace := range m.workspaces {
+		workDirs = append(workDirs, workspace.WorkDir())
+	}
+	return workDirs
+}
+
 func (m Mason) CleanWorkDirs() error {
 	var errs error
-	for _, workspace := range m.workspaces {
-		m.Logger.WithFields("dir", workspace.WorkDir()).Debug("Deleting work directory")
-		err := os.RemoveAll(workspace.WorkDir())
+	for _, workdir := range m.WorkDirs() {
+		m.Logger.WithFields("dir", workdir).Debug("Deleting work directory")
+		err := os.RemoveAll(workdir)
 		if err != nil {
-			errs = errors.Join(errs, fmt.Errorf("failed to remove work directory %s: %w", workspace.WorkDir(), err))
+			errs = errors.Join(errs, fmt.Errorf("failed to remove work directory %s: %w", workdir, err))
 		}
 	}
 	if errs != nil {

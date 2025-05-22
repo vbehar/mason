@@ -16,7 +16,6 @@ import (
 	"github.com/pborman/indent"
 	"github.com/rs/xid"
 	"github.com/vbehar/mason/pkg/dagger"
-	"github.com/wagoodman/go-partybus"
 )
 
 type Blueprint struct {
@@ -44,6 +43,13 @@ func (b Blueprint) Filter(selector labels.Selector) Blueprint {
 			b.logger().WithFields("name", brick.Metadata.Name, "kind", brick.Kind).
 				Trace("Brick matches selector")
 			filteredBricks = append(filteredBricks, brick)
+			continue
+		}
+		if brick.Metadata.PostRun != "" {
+			b.logger().WithFields("name", brick.Metadata.Name, "kind", brick.Kind).
+				Trace("Brick is marked as post-run, it won't be filtered")
+			filteredBricks = append(filteredBricks, brick)
+			continue
 		}
 	}
 	if len(filteredBricks) != len(b.Bricks) {
@@ -97,29 +103,42 @@ func (b Blueprint) RenderPlan() (*Plan, error) {
 		return nil, fmt.Errorf("failed to write file %q: %w", daggerScriptFilePath, err)
 	}
 
+	logFilePath := filepath.Join(planDir, "dagger_render-plan.log")
+	logFile, err := os.Create(logFilePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create log file %q: %w", logFilePath, err)
+	}
+	defer func() {
+		err := logFile.Close()
+		if err != nil {
+			b.logger().WithFields("path", logFilePath).
+				Errorf("Failed to close log file: %s", err)
+		}
+	}()
+
 	b.logger().WithFields("script", daggerScriptFilePath).Info("Rendering plan with Dagger")
 	var daggerOutWriter bytes.Buffer
-	err = dagger.ExecScript(dagger.ExecScriptOpts{
-		ScriptPath: daggerScriptFilePath,
-		Env:        b.workspace.mason.DaggerEnv,
-		Args:       b.workspace.mason.DaggerArgs,
-		Stderr:     b.workspace.mason.DaggerOut,
-		Stdout:     &daggerOutWriter,
+	execErr := dagger.ExecScript(dagger.ExecScriptOpts{
+		BinaryPath:    b.workspace.mason.DaggerBinary,
+		Logger:        b.logger(),
+		ScriptPath:    daggerScriptFilePath,
+		Env:           b.workspace.mason.DaggerEnv,
+		Args:          b.workspace.mason.DaggerArgs,
+		DisableOutput: b.workspace.mason.DaggerOutputDisabled,
+		Stdout:        &daggerOutWriter,
+		Stderr:        logFile,
 	})
-	if err != nil {
-		return nil, err
-	}
 
+	// parse/write the dagger output before handling the error
+	// to make sure we don't lose it before returning
 	output := strings.TrimSpace(daggerOutWriter.String())
-
 	b.logger().Infof("Dagger output:\n%+v\n",
 		color.Success.Sprint(indent.String("  ", output)),
 	)
-	b.workspace.mason.EventBus.Publish(partybus.Event{
-		Type:   EventTypeDaggerOutput,
-		Source: b,
-		Value:  output,
-	})
+
+	if execErr != nil {
+		return nil, fmt.Errorf("failed to render plan: %w", execErr)
+	}
 
 	b.logger().WithFields("path", planDir).Debug("Parsing generated plan")
 	plan, err := ParsePlanFromDir(planDir)
