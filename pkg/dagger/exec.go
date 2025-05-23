@@ -13,6 +13,7 @@ import (
 
 	"github.com/anchore/go-logger"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/charmbracelet/x/term"
 	"github.com/creack/pty"
 )
 
@@ -39,6 +40,9 @@ func ExecScript(opts ExecScriptOpts) error {
 	if opts.DisableOutput {
 		// let's just write directly to our buffer
 		outputWriter = &outputBuffer
+	} else if !term.IsTerminal(os.Stderr.Fd()) {
+		// let's just duplicate stderr to our buffer
+		outputWriter = io.MultiWriter(os.Stderr, &outputBuffer)
 	} else {
 		// we'll need to set Dagger's stderr to a fake terminal
 		// so that we can capture the content and write it to our buffer

@@ -8,6 +8,7 @@ require (
 	github.com/anchore/go-logger v0.0.0-20250318195838-07ae343dd722
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/x/ansi v0.9.2
+	github.com/charmbracelet/x/term v0.2.1
 	github.com/coding-hui/common v0.8.7
 	github.com/creack/pty v1.1.24
 	github.com/goccy/go-yaml v1.17.1
@@ -27,7 +28,6 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.2.3-0.20250311203215-f60798e515dc // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd // indirect
-	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
