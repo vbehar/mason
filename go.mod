@@ -3,7 +3,7 @@ module github.com/vbehar/mason
 go 1.24.2
 
 require (
-	github.com/anchore/clio v0.0.0-20250408180537-ec8fa27f0d9f
+	github.com/anchore/clio v0.0.0-20250523175750-7f25834ffe5e
 	github.com/anchore/fangs v0.0.0-20250512222850-4ff6e4a2d62b
 	github.com/anchore/go-logger v0.0.0-20250318195838-07ae343dd722
 	github.com/charmbracelet/lipgloss v1.1.0
@@ -72,6 +72,3 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-// https://github.com/anchore/clio/pull/116
-//replace github.com/anchore/clio => github.com/vbehar/clio v0.0.0-20250519132508-8127ce9be668
