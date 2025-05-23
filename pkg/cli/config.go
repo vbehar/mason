@@ -15,6 +15,9 @@ var masonConfig = &MasonConfig{
 	KeepWorkDir: false,
 	Dagger: DaggerConfig{
 		Binary: "dagger",
+		Env: []string{
+			"DAGGER_ALLOW_LLM=all",
+		},
 	},
 }
 
