@@ -2,6 +2,8 @@ dario.cat/mergo v1.0.2 h1:85+piFYR1tMbRrLcDwR18y4UKJ3aH1Tbzi24VRW1TK8=
 dario.cat/mergo v1.0.2/go.mod h1:E/hbnu0NxMFBjpMIE34DRGLWqDy0g5FuKDhCb31ngxA=
 github.com/adrg/xdg v0.5.3 h1:xRnxJXne7+oWDatRhR1JLnvuccuIeCoBu2rtuLqQB78=
 github.com/adrg/xdg v0.5.3/go.mod h1:nlTsY+NNiCBGCK2tpm09vRqfVzrc2fLmXGpBLF0zlTQ=
+github.com/anchore/clio v0.0.0-20250408180537-ec8fa27f0d9f h1:jTeN+fKTXz1VFo3Zj7Msnx//s5kD6Htd+SS0z9/o7Ss=
+github.com/anchore/clio v0.0.0-20250408180537-ec8fa27f0d9f/go.mod h1:jQ+jv7v9RQnc5oA+Z0rAyXsQfaCAZHwY/CJZiLVggQ4=
 github.com/anchore/fangs v0.0.0-20250512222850-4ff6e4a2d62b h1:aP51uZ0FwItKkz9Zt2drAVlpOuGq0zB2LaiVqqKtuZo=
 github.com/anchore/fangs v0.0.0-20250512222850-4ff6e4a2d62b/go.mod h1:dE7hx7sc46OsljkNpHc1kMVzOggAurXu/4C5MS4ttVo=
 github.com/anchore/go-homedir v0.0.0-20250319154043-c29668562e4d h1:gT69osH9AsdpOfqxbRwtxcNnSZ1zg4aKy2BevO3ZBdc=
@@ -152,8 +154,6 @@ github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOf
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/subosito/gotenv v1.6.0 h1:9NlTDc1FTs4qu0DDq7AEtTPNw6SVm7uBMsUCUjABIf8=
 github.com/subosito/gotenv v1.6.0/go.mod h1:Dk4QP5c2W3ibzajGcXpNraDfq2IrhjMIvMSWPKKo0FU=
-github.com/vbehar/clio v0.0.0-20250519132508-8127ce9be668 h1:O6VYsN24nQpznR1SwvrC7tf5bbCSOnS7D9tvWNecZ44=
-github.com/vbehar/clio v0.0.0-20250519132508-8127ce9be668/go.mod h1:jQ+jv7v9RQnc5oA+Z0rAyXsQfaCAZHwY/CJZiLVggQ4=
 github.com/wagoodman/go-partybus v0.0.0-20230516145632-8ccac152c651 h1:jIVmlAFIqV3d+DOxazTR9v+zgj8+VYuQBzPgBZvWBHA=
 github.com/wagoodman/go-partybus v0.0.0-20230516145632-8ccac152c651/go.mod h1:b26F2tHLqaoRQf8DywqzVaV1MQ9yvjb0OMcNl7Nxu20=
 github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e h1:JVG44RsyaB9T2KIHavMF/ppJZNG9ZpyihvCd0w101no=

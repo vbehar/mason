@@ -74,4 +74,4 @@ require (
 )
 
 // https://github.com/anchore/clio/pull/116
-replace github.com/anchore/clio => github.com/vbehar/clio v0.0.0-20250519132508-8127ce9be668
+//replace github.com/anchore/clio => github.com/vbehar/clio v0.0.0-20250519132508-8127ce9be668
