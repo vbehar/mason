@@ -1,5 +1,7 @@
 # Mason
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/vbehar/mason)
+
 **Declarative build tool based on [Dagger](https://dagger.io/).**
 
 [![demo](https://asciinema.org/a/719109.svg)](https://asciinema.org/a/719109)
