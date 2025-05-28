@@ -15,8 +15,12 @@ var masonConfig = &MasonConfig{
 	KeepWorkDir: false,
 	Dagger: DaggerConfig{
 		Binary: "dagger",
+		Args: []string{
+			"--no-mod",
+		},
 		Env: []string{
 			"DAGGER_ALLOW_LLM=all",
+			"DAGGER_NO_NAG=1",
 		},
 	},
 }
@@ -79,7 +83,7 @@ func (c *MasonConfig) PostLoad() error {
 		return false
 	})
 	if !hasQuietFlag && c.state != nil && c.state.Config.Log.Verbosity == 0 {
-		c.Dagger.Args = append(c.Dagger.Args, "-q=1")
+		c.Dagger.Args = append(c.Dagger.Args, "--quiet=1")
 	}
 
 	// now that our config is loaded, we can use it

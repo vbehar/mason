@@ -89,8 +89,7 @@ func ExecScript(opts ExecScriptOpts) error {
 	args = append(args, opts.ScriptPath)
 
 	cmd := exec.Command(opts.BinaryPath, args...)
-	cmd.Env = append(cmd.Environ(), "DAGGER_NO_NAG=1")
-	cmd.Env = append(cmd.Env, opts.Env...)
+	cmd.Env = append(cmd.Environ(), opts.Env...)
 
 	cmd.Stderr = outputWriter
 	if opts.Stdout != nil {
