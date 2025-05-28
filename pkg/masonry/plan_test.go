@@ -244,6 +244,20 @@ host | directory . | file $log_file_path | contents
 .echo`,
 		},
 		{
+			name: "referencing an environment variable",
+			sourceScripts: []Script{
+				{
+					Name:    "Script",
+					Content: "container | from $CTR_SRC",
+				},
+			},
+			expectedScript: `#!/usr/bin/env dagger
+
+# Script
+container | from $CTR_SRC
+.echo`,
+		},
+		{
 			name: "variable defined twice",
 			sourceScripts: []Script{
 				{
@@ -256,16 +270,6 @@ host | directory . | file $log_file_path | contents
 				},
 			},
 			expectedError: `variable "alpine_ctr" is defined twice: by "Script1" and "Script2"`,
-		},
-		{
-			name: "variable used but not defined",
-			sourceScripts: []Script{
-				{
-					Name:    "Script",
-					Content: "$missing_var | do something",
-				},
-			},
-			expectedError: `variable "missing_var" is used but not defined. Used by [Script]`,
 		},
 		{
 			name: "circular dependency",

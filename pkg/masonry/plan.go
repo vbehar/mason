@@ -397,11 +397,8 @@ func mergeScripts(scripts []Script) (string, error) {
 	for varName, scripts := range variablesUsages {
 		varDefinitionScript, ok := variablesDefinitions[varName]
 		if !ok {
-			var scriptsNames []string
-			for _, script := range scripts {
-				scriptsNames = append(scriptsNames, script.Name)
-			}
-			return "", fmt.Errorf("variable %q is used but not defined. Used by %v", varName, scriptsNames)
+			// this can happen if the variable references an environment variable
+			continue
 		}
 
 		for _, script := range scripts {
