@@ -1,5 +1,5 @@
 kind: RunBinary
-moduleRef: github.com/vbehar/mason-modules/run@v0.0.3
+moduleRef: github.com/vbehar/mason-modules/run@v0.0.5
 metadata:
   name: mason-version-amd64
   labels:
@@ -16,7 +16,7 @@ spec:
     - version
 ---
 kind: RunBinary
-moduleRef: github.com/vbehar/mason-modules/run@v0.0.3
+moduleRef: github.com/vbehar/mason-modules/run@v0.0.5
 metadata:
   name: mason-version-arm64
   labels:

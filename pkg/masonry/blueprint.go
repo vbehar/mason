@@ -88,7 +88,7 @@ func (b Blueprint) RenderPlan() (*Plan, error) {
 			return nil, fmt.Errorf("failed to get relative path of %q: %w", moduleDir, err)
 		}
 		moduleName := moduleRef.SanitizedName()
-		daggerScript += fmt.Sprintf("with-directory %[1]s $(%[2]s | render-plan %[3]s) |\n",
+		daggerScript += fmt.Sprintf("with-directory %[1]s $(%[2]s | render-plan $(host | directory %[3]s --no-git-auto-ignore)) |\n",
 			moduleName, moduleRef, relativeModuleDir)
 	}
 	daggerScript += "export " + planDir + "\n"

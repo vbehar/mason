@@ -1,5 +1,5 @@
 kind: CodeReview
-moduleRef: github.com/vbehar/mason-modules/mason-llm@v0.0.3
+moduleRef: github.com/vbehar/mason-modules/mason-llm@v0.0.5
 metadata:
   name: code-review
 spec:
